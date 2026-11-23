@@ -1,3 +1,5 @@
+# To use this tool just download the Workshop System Philosophy.HTML and double click the icon. It runs in your browser.
+
 # Workshop_Philosophy
 An HTML slider tool to help which shop organization philosophy works best for you.
 Shop System Levers: Layers
