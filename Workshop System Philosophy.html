@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Shop System Levers: Layers</title>
+<style>
+:root{--bg:#f6f4ef;--card:#fff;--ink:#1d1d1b;--mute:#6b6a64;--line:#dedbd2;--acc:#c2410c;--warn:#b45309;--bar:#e7e4db;
+box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);color-scheme:light}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#171715;--card:#222220;--ink:#efede6;--mute:#a09e95;--line:#3a3935;--acc:#fb923c;--warn:#fbbf24;--bar:#33322e;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#171715;--card:#222220;--ink:#efede6;--mute:#a09e95;--line:#3a3935;--acc:#fb923c;--warn:#fbbf24;--bar:#33322e;color-scheme:dark}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.45 system-ui,-apple-system,"Segoe UI",sans-serif}
+main{max-width:760px;margin:0 auto;padding:20px 16px 40px}
+h1{font-size:1.5rem;margin:0 0 4px}
+h2{font-size:.8rem;letter-spacing:.08em;text-transform:uppercase;color:var(--mute);margin:26px 0 10px}
+p.sub,small,.mute{color:var(--mute)}
+p.sub{margin:0 0 14px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:14px 16px;margin-bottom:10px}
+.chip{display:inline-block;border:1px solid var(--line);border-radius:999px;padding:3px 10px;font-size:.85rem;margin:0 4px 6px 0}
+button{font:inherit;background:var(--card);color:var(--ink);border:1px solid var(--line);border-radius:8px;padding:6px 12px;cursor:pointer}
+button:hover{border-color:var(--acc)}
+button.on{border-color:var(--acc);background:var(--acc);color:#fff}
+.tabs{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:var(--bg);padding:8px 0;display:flex;gap:6px;overflow-x:auto}
+.tabs button{white-space:nowrap}
+.sum{display:flex;justify-content:space-between;gap:10px;padding:5px 0;border-bottom:1px solid var(--line);font-size:.92rem}
+.sum:last-child{border:0}
+.sum b{font-weight:600}
+.presets{display:flex;flex-wrap:wrap;gap:8px}
+.poles{display:flex;justify-content:space-between;font-weight:600;font-size:.95rem;margin-bottom:4px}
+input[type=range]{width:100%;accent-color:var(--acc);margin:4px 0}
+.notes{display:flex;justify-content:space-between;gap:16px;color:var(--mute);font-size:.8rem}
+.notes span{flex:1}.notes span:last-child{text-align:right}
+.bar{height:6px;border-radius:3px;background:var(--bar);margin:5px 0 3px;overflow:hidden}
+.bar i{display:block;height:100%;background:var(--warn)}
+.row{display:flex;justify-content:space-between;gap:10px;font-size:.92rem}
+</style>
+</head>
+<body>
+<main>
+<h1>Shop System Levers: Layers</h1>
+<p class="sub">A shop isn’t one system. Sort what you store by size, frequency, fragility, and how task-specific it is, then set the levers separately for each layer.</p>
+
+<div class="card consts">
+<span class="chip">Every item has a home</span><span class="chip">Home is visible to the system</span><span class="chip">Standard unit or module</span><span class="chip">Few steps to retrieve</span><span class="chip">Easy put-away</span><span class="chip">Missing items are obvious</span>
+</div>
+
+<h2>Your shop at a glance</h2>
+<div class="card" id="sum"></div>
+
+<h2>Layer</h2>
+<div class="tabs" id="tabs"></div>
+<div class="card" id="desc"></div>
+<div class="card" id="match"></div>
+
+<h2>Load a preset into this layer</h2>
+<div class="presets" id="presets"></div>
+
+<h2>Levers</h2>
+<div id="levers"></div>
+
+<h2>Where this layer fights itself</h2>
+<div id="tensions"></div>
+</main>
+<script>
+var L=[
+{id:"flex",a:"Rigid",b:"Flexible",na:"Stable locations, muscle memory",nb:"Reconfigure freely, grow over time"},
+{id:"mob",a:"Fixed",b:"Mobile",na:"Solid, heavy, always in the same spot",nb:"Reshape the room, tuck away for space"},
+{id:"poi",a:"Central",b:"Point of use",na:"One home per tool, no duplicates",nb:"Lathe tools live at the lathe"},
+{id:"vis",a:"Enclosed",b:"Open",na:"Protected from dust and bumps",nb:"See what’s there and what’s missing"},
+{id:"fit",a:"Standard module",b:"Custom fit",na:"Anything swaps with anything",nb:"Holder shaped to the exact tool"},
+{id:"proto",a:"Habit",b:"Protocol",na:"Low overhead, easy to live with",nb:"Written rules, audits, accountability"},
+{id:"dens",a:"Spacious",b:"Dense",na:"Easy access, room to work",nb:"More tools in less floor space"}
+];
+var P={
+"Paulk-ish":{flex:85,mob:70,poi:80,vis:75,fit:30,proto:25,dens:55},
+"Savage-ish":{flex:40,mob:40,poi:85,vis:90,fit:70,proto:50,dens:60},
+"Sachs-ish":{flex:30,mob:40,poi:50,vis:50,fit:60,proto:95,dens:60},
+"Toyota 5S-ish":{flex:25,mob:30,poi:85,vis:95,fit:85,proto:90,dens:40},
+"NASA-ish":{flex:20,mob:25,poi:40,vis:35,fit:85,proto:98,dens:90},
+"Tool chest-ish":{flex:25,mob:40,poi:20,vis:25,fit:70,proto:55,dens:80},
+"Gridfinity-ish":{flex:85,mob:60,poi:50,vis:40,fit:10,proto:20,dens:85}
+};
+var Y=[
+{n:"Machines & layout",s:"Big, heavy, moved rarely",d:"Lathe, table saw, bench. Sorted by size: this layer sets the floor plan that every other layer lives inside.",v:{flex:50,mob:55,poi:50,vis:80,fit:20,proto:30,dens:50}},
+{n:"Station tools",s:"Used daily, tied to one task",d:"The lathe tools at the lathe. Sorted by frequency and task-specificity: if you reach for it every session, it lives at the work.",v:{flex:45,mob:30,poi:95,vis:90,fit:75,proto:40,dens:55}},
+{n:"Carry & job kits",s:"Used weekly, travel to the job",d:"Carts, trays, and bags that follow you around the shop or off-site. Sorted by how often the job changes.",v:{flex:80,mob:90,poi:60,vis:60,fit:40,proto:30,dens:60}},
+{n:"Precision & rare",s:"Fragile or seldom used",d:"Measuring, sharpening, specialty cutters. Sorted by fragility: protect these, keep one copy, know where it is.",v:{flex:20,mob:30,poi:15,vis:25,fit:75,proto:55,dens:80}},
+{n:"Hardware & consumables",s:"Small, many, constantly refilled",d:"Fasteners, bits, abrasives. Sorted by count: this is where a unit-level standard like Gridfinity earns its place.",v:{flex:80,mob:60,poi:40,vis:50,fit:10,proto:25,dens:85}}
+];
+var R=[
+{n:"Mobile + point of use",f:function(v){return Math.min(v.mob,v.poi)},t:"A station that moves needs its tools to move too: duplicates or cart kits."},
+{n:"Custom fit + flexible",f:function(v){return Math.min(v.fit,v.flex)},t:"Shaped holders lock a tool in place. Changing tools means rebuilding the holder."},
+{n:"Open + dense",f:function(v){return Math.min(v.vis,v.dens)},t:"Packed open storage turns noisy and dusty, and outlines stop reading."},
+{n:"Open + mobile",f:function(v){return Math.min(v.vis,v.mob)},t:"Exposed tools get bumped or shed when the cart rolls."},
+{n:"Protocol + flexible",f:function(v){return Math.min(v.proto,v.flex)},t:"Rules rely on stable homes, and a shifting layout breaks the memory they depend on."},
+{n:"Point of use + dense",f:function(v){return Math.min(v.poi,v.dens)},t:"Duplicated tools at every station need floor and wall space you’ve squeezed out."},
+{n:"Enclosed + habit",f:function(v){return Math.min(100-v.vis,100-v.proto)},t:"Nothing shows what’s missing and nothing enforces return. Clutter creeps in."}
+];
+var cur=1,$=function(i){return document.getElementById(i)};
+function rank(v){return Object.keys(P).map(function(k){var s=0;L.forEach(function(l){var d=v[l.id]-P[k][l.id];s+=d*d});return{n:k,p:Math.max(0,Math.round(100-Math.sqrt(s)/1.5))}}).sort(function(a,b){return b.p-a.p})}
+function nm(x){return x.replace("-ish","")}
+function head(m){var a=m[0],b=m[1];
+ if(a.p<60)return"No close match: your own system";
+ if(a.p-b.p<=6)return"Blend of "+nm(a.n)+" and "+nm(b.n);
+ return"Closest: "+nm(a.n)}
+var lv=$("levers");
+L.forEach(function(l){
+ var d=document.createElement("div");d.className="card";
+ d.innerHTML='<div class="poles"><span>'+l.a+'</span><span>'+l.b+'</span></div><input type="range" min="0" max="100" id="s_'+l.id+'" aria-label="'+l.a+' to '+l.b+'"><div class="notes"><span>'+l.na+'</span><span>'+l.nb+'</span></div>';
+ lv.appendChild(d);
+ d.querySelector("input").addEventListener("input",function(e){Y[cur].v[l.id]=+e.target.value;draw()});
+});
+Object.keys(P).forEach(function(k){
+ var b=document.createElement("button");b.textContent=k;
+ b.onclick=function(){L.forEach(function(l){Y[cur].v[l.id]=P[k][l.id]});sync();draw()};
+ $("presets").appendChild(b);
+});
+Y.forEach(function(y,i){
+ var b=document.createElement("button");b.textContent=y.n;b.id="tab"+i;
+ b.onclick=function(){cur=i;sync();draw()};
+ $("tabs").appendChild(b);
+});
+function sync(){L.forEach(function(l){$("s_"+l.id).value=Y[cur].v[l.id]})}
+function draw(){
+ Y.forEach(function(y,i){$("tab"+i).className=i===cur?"on":""});
+ $("sum").innerHTML=Y.map(function(y,i){var m=rank(y.v);return'<div class="sum"><span><b>'+y.n+'</b><br><small>'+y.s+'</small></span><span style="text-align:right">'+head(m)+'<br><small>'+nm(m[0].n)+' '+m[0].p+'%'+(m[1].p>=60?' · '+nm(m[1].n)+' '+m[1].p+'%':'')+'</small></span></div>'}).join("");
+ var y=Y[cur],m=rank(y.v);
+ $("desc").innerHTML='<b>'+y.n+'</b><br><span class="mute">'+y.d+'</span>';
+ $("match").innerHTML='<b>'+head(m)+'</b><div class="bar"><i style="width:'+m[0].p+'%;background:var(--acc)"></i></div><small>'+m[0].n+' '+m[0].p+'% · '+m[1].n+' '+m[1].p+'%</small>';
+ var out=R.map(function(r){return{n:r.n,t:r.t,s:r.f(y.v)}}).filter(function(o){return o.s>=40}).sort(function(a,b){return b.s-a.s});
+ var h=out.map(function(o){return'<div class="card"><div class="row"><b>'+o.n+'</b><span>'+Math.round(o.s)+'%</span></div><div class="bar"><i style="width:'+o.s+'%"></i></div><small>'+o.t+'</small></div>'}).join("");
+ $("tensions").innerHTML=h||'<div class="card mute">No strong conflicts in this layer at these settings.</div>';
+}
+sync();draw();
+</script>
+</body>
+</html>
